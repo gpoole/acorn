@@ -374,10 +374,14 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
 
 pp.parseExpressionStatement = function(node, expr) {
   node.expression = expr
-  if (this.maybeAwait && !this.canInsertSemicolon())
-    this.raise(expr.start, "Can not use 'await' outside async function")
-  else
-    this.maybeAwait = false
+  if (this.maybeAwait) {
+    if (!this.canInsertSemicolon()) {
+      this.raise(expr.start, "Can not use 'await' outside async function")
+    } else if (expr.type === "Identifier" && this.inModule) {
+      this.raise(expr.start, "The keyword 'await' is reserved")
+    }
+  }
+  this.maybeAwait = false
   this.semicolon()
   return this.finishNode(node, "ExpressionStatement")
 }

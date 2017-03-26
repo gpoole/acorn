@@ -1669,7 +1669,7 @@ test("await", {
 }, {ecmaVersion: 8})
 
 // 'await' is a keyword in modules.
-testFail("await", "Can not use 'await' outside async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await", "The keyword 'await' is reserved (1:0)", {ecmaVersion: 8, sourceType: "module"})
 
 // Await expressions is invalid outside of async functions.
 testFail("await a", "Can not use 'await' outside async function (1:0)", {ecmaVersion: 8})
