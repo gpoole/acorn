@@ -125,6 +125,7 @@ pp.parseStatement = function(declaration, topLevel, exports) {
     }
 
     let maybeName = this.value, expr = this.parseExpression()
+
     if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
       return this.parseLabeledStatement(node, maybeName, expr)
     else return this.parseExpressionStatement(node, expr)
@@ -373,6 +374,10 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
 
 pp.parseExpressionStatement = function(node, expr) {
   node.expression = expr
+  if (this.maybeAwait && !this.canInsertSemicolon())
+    this.raise(expr.start, "Can not use 'await' outside async function")
+  else
+    this.maybeAwait = false
   this.semicolon()
   return this.finishNode(node, "ExpressionStatement")
 }

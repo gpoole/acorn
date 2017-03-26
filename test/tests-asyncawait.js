@@ -1669,11 +1669,12 @@ test("await", {
 }, {ecmaVersion: 8})
 
 // 'await' is a keyword in modules.
-testFail("await", "The keyword 'await' is reserved (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await", "Can not use 'await' outside async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
 
 // Await expressions is invalid outside of async functions.
-testFail("await a", "Unexpected token (1:6)", {ecmaVersion: 8})
-testFail("await a", "The keyword 'await' is reserved (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await a", "Can not use 'await' outside async function (1:0)", {ecmaVersion: 8})
+testFail("await a", "Can not use 'await' outside async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("function wrap() {\nawait wrap\n}", "Can not use 'await' outside async function (2:0)", {ecmaVersion: 8})
 
 // Await expressions in async functions.
 test("async function foo(a, b) { await a }", {
@@ -2191,7 +2192,7 @@ testFail("(class {async foo() { await }})", "Unexpected token (1:28)", {ecmaVers
 // Forbid await expressions in default parameters:
 testFail("async function foo(a = await b) {}", "Await expression cannot be a default value (1:23)", {ecmaVersion: 8})
 testFail("(async function foo(a = await b) {})", "Await expression cannot be a default value (1:24)", {ecmaVersion: 8})
-testFail("async (a = await b) => {}", "Unexpected token (1:17)", {ecmaVersion: 8})
+testFail("async (a = await b) => {}", "Can not use 'await' outside async function (1:17)", {ecmaVersion: 8})
 testFail("async function wrapper() {\nasync (a = await b) => {}\n}", "Await expression cannot be a default value (2:11)", {ecmaVersion: 8})
 testFail("({async foo(a = await b) {}})", "Await expression cannot be a default value (1:16)", {ecmaVersion: 8})
 testFail("(class {async foo(a = await b) {}})", "Await expression cannot be a default value (1:22)", {ecmaVersion: 8})

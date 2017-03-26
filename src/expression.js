@@ -202,6 +202,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   } else {
+    this.maybeAwait = this.isContextual("await")
     expr = this.parseExprSubscripts(refDestructuringErrors)
     if (this.checkExpressionErrors(refDestructuringErrors)) return expr
     while (this.type.postfix && !this.canInsertSemicolon()) {
@@ -751,7 +752,13 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
   let elts = [], first = true
   while (!this.eat(close)) {
     if (!first) {
-      this.expect(tt.comma)
+      if (!this.eat(tt.comma)) {
+        if (this.maybeAwait) {
+          this.raise(this.start, "Can not use 'await' outside async function")
+        } else {
+          this.unexpected()
+        }
+      }
       if (allowTrailingComma && this.afterTrailingComma(close)) break
     } else first = false
 
@@ -780,7 +787,9 @@ pp.parseIdent = function(liberal) {
   if (this.type === tt.name) {
     if (!liberal && (this.strict ? this.reservedWordsStrict : this.reservedWords).test(this.value) &&
         (this.options.ecmaVersion >= 6 ||
-         this.input.slice(this.start, this.end).indexOf("\\") == -1))
+         this.input.slice(this.start, this.end).indexOf("\\") == -1) &&
+        (this.value !== "await" ||
+          this.options.ecmaVersion < 8))
       this.raiseRecoverable(this.start, "The keyword '" + this.value + "' is reserved")
     if (this.inGenerator && this.value === "yield")
       this.raiseRecoverable(this.start, "Can not use 'yield' as identifier inside a generator")
